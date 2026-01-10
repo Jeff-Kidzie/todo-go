@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,10 @@ func AddTodoHandler(c *gin.Context) {
 func GetAllTodosHandler(c *gin.Context) {
 	todos, err := AllList(db)
 	throwErrorIfPresent(err, c)
+	if len(todos) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No todos found"})
+		return
+	} 
 	c.JSON(http.StatusOK, todos)
 }
 

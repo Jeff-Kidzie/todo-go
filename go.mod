@@ -1,6 +1,6 @@
 module github.com/Jeff-Kidzie/todo-go
 
-go 1.25.5
+go 1.23.12
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect
