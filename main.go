@@ -3,67 +3,36 @@ package main
 import (
 	"database/sql"
 	"fmt"
-
+	"net/http"
 	"github.com/Jeff-Kidzie/todo-go/database"
+	"github.com/gin-gonic/gin"
 )
 
+var db *sql.DB
+
+func initDb() {
+	var err error
+	db, err = database.Connect()
+	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+		return
+	}
+}
+
 func main() {
-	fmt.Println("Hello World")
-	db := database.Connect()
-	showPrompt(db)
-}
+	initDb()
+	defer db.Close()
+	router := gin.Default()
 
-func showPrompt(db *sql.DB) {
-	fmt.Println("1. Show All Todos")
-	fmt.Println("2. Add Todo")
-	fmt.Println("3. Update Todo")
-	fmt.Println("4. Delete Todo")
-	fmt.Println("5. Exit")
-	var choice int
-	fmt.Print("Enter your choice: ")
-	_, err := fmt.Scan(&choice)
-	if err != nil {
-		fmt.Println("Invalid input. Please enter a number between 1 and 5.")
-		showPrompt(db)
-		return
-	}
-
-	switch choice {
-	case 1:
-		showAllTodo(db)
-	case 2:
-		AddTodo(db)
-	case 3:
-		UpdateTodo(db)
-	case 4:
-		DeleteTodo(db)
-	case 5:
-		fmt.Println("Exiting...")
-		return
-	default:
-		fmt.Println("Invalid choice. Please try again.")
-	}
-	showPrompt(db)
-}
-
-func UpdateTodo(db *sql.DB) {
-	panic("unimplemented")
-}
-
-func showAllTodo(db *sql.DB) {
-	todos, err := AllList(db)
-	if err != nil {
-		fmt.Println(err)
-	}
-	if len(todos) == 0 {
-		fmt.Println("No todos found")
-		return
-	}
-	fmt.Println("id | Title | Description | Is Done | Created At | Updated At")
-	for _, todo := range todos {
-		fmt.Printf("%d | %s | %s | %t | %s | %s\n", todo.ID, todo.Title, todo.Description, todo.IsDone, todo.CreatedAt.Format("2006-01-02 15:04:05"), todo.UpdatedAt.Format("2006-01-02 15:04:05"))
-	}
-	fmt.Println("-------------------------------")
+	//Routes
+	router.GET("/todos", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Welcome to the Todo API")
+	})
+	router.POST("/todos/add", AddTodoHandler)
+	router.PUT("/todos/update", UpdateTodoHandler)
+	router.GET("/todos/all", GetAllTodosHandler)
+	router.DELETE("/todos/delete", DeleteTodoHandler)
+	router.Run(":8080")
 }
 
 func AddTodo(db *sql.DB) {
