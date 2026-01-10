@@ -7,12 +7,12 @@ import (
 )
 
 type Todo struct {
-	ID          int
-	Title       string
-	Description string
-	IsDone      bool
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	IsDone      bool      `json:"is_done"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func Add(db *sql.DB, todo Todo) (int, error) {
