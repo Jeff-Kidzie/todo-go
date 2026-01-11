@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       target: builder  # Use the builder stage from Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - .:/app  # Mount your code into the container
     working_dir: /app
