@@ -3,9 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
-
 	_ "github.com/lib/pq"
+	"os"
 )
 
 func Connect() (*sql.DB, error) {
@@ -34,7 +33,7 @@ func Connect() (*sql.DB, error) {
 		port = "5432"
 	}
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host,user, password, dbname, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbname, port)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect database: %w", err)

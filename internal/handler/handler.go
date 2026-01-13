@@ -1,50 +1,54 @@
-package main
+package handler
 
 import (
 	"database/sql"
-	"net/http"
-
+	"github.com/Jeff-Kidzie/todo-go/internal/models"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func AddTodoHandler(c *gin.Context) {
-	var todoInput Todo
+type Handler struct {
+	db *sql.DB
+}
+
+func AddTodoHandler(h *Handler,c *gin.Context) {
+	var todoInput models.Todo
 	if err := c.ShouldBindJSON(&todoInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id, err := Add(db, todoInput)
+	id, err := models.Add(h.db, todoInput)
 	throwErrorIfPresent(err, c)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Todo added successfully", "id": id})
 	// Implementation for adding a todo via HTTP handler
 }
 
-func GetAllTodosHandler(c *gin.Context) {
-	todos, err := AllList(db)
+func GetAllTodosHandler(h *Handler,c *gin.Context) {
+	todos, err := models.AllList(h.db)
 	throwErrorIfPresent(err, c)
 	if len(todos) == 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "No todos found"})
 		return
-	} 
+	}
 	c.JSON(http.StatusOK, todos)
 }
 
-func UpdateTodoHandler(c *gin.Context) {
-	var todoInput Todo
+func UpdateTodoHandler(h *Handler,c *gin.Context) {
+	var todoInput models.Todo
 	if err := c.ShouldBindJSON(&todoInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := Update(db, todoInput)
+	err := models.Update(h.db, todoInput)
 	throwErrorIfPresent(err, c)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Todo updated successfully"})
 }
 
-func DeleteTodoHandler(c *gin.Context) {
+func DeleteTodoHandler(h *Handler,c *gin.Context) {
 	var req struct {
 		ID int `json:"id"`
 	}
@@ -53,7 +57,7 @@ func DeleteTodoHandler(c *gin.Context) {
 		return
 	}
 
-	err := Delete(db, req.ID)
+	err := models.Delete(h.db, req.ID)
 	throwErrorIfPresent(err, c)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Todo deleted successfully"})
